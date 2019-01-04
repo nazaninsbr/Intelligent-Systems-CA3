@@ -131,6 +131,43 @@ def calculate_accuracy(clusters, number_of_data_points):
 				wrongly_clustered += 1
 	print('Accuracy is: '+str((number_of_data_points - wrongly_clustered)/number_of_data_points*100)+' %')
 
+def calculate_separating_index(clusters):
+	d_Sl_Sl = {}
+	for clusterNumber in clusters.keys():
+		min_dist = sys.maxsize
+		for x1_id in range(len(clusters[clusterNumber])):
+			for x2_id in range(len(clusters[clusterNumber])):
+				if x1_id==x2_id:
+					continue
+				dist = calculate_distance_from_center(clusters[clusterNumber][x1_id][1], clusters[clusterNumber][x2_id][1])
+				if dist<min_dist:
+					min_dist = dist
+		d_Sl_Sl[clusterNumber] = min_dist
+
+	min_j_val = sys.maxsize
+	min_j = -1
+	for clusterNumber_1 in clusters.keys():
+		min_i = -1
+		min_i_val = sys.maxsize
+		for clusterNumber_2 in clusters.keys():
+			if clusterNumber_1 == clusterNumber_2:
+				continue 
+			min_dist = sys.maxsize
+			for val1 in clusters[clusterNumber_1]:
+				for val2 in clusters[clusterNumber_2]:
+					dist = calculate_distance_from_center(val1[1], val2[1])
+					if dist<min_dist:
+						min_dist = dist
+			if min_dist<min_i_val:
+				min_i_val = min_dist
+				min_i = clusterNumber_2
+		if min_i_val<min_j_val:
+			min_j_val = min_i_val
+			min_j = clusterNumber_1
+
+	return min_j
+
+
 def run_k_means(data):
 	for k_num in NUMBER_OF_CLUSTERS:
 		inner_dist_plot_vals, outer_dist_plot_vals, cost_plot_vals, iteration_plot_vals = [], [], [], []
@@ -155,6 +192,7 @@ def run_k_means(data):
 			iteration_plot_vals.append(epoch_number)
 		
 		plot_the_values(inner_dist_plot_vals, outer_dist_plot_vals, cost_plot_vals, iteration_plot_vals, k_num)
+		print('SI: ',calculate_separating_index(clusters))
 		calculate_accuracy(clusters, len(data))
 
 def not_random_initial_clusters(iris_data, k_num):
@@ -258,6 +296,6 @@ def run_k_means_5_times_for_each_number(data):
 def main():
 	data = fix_iris_data_types(read_file(DATA_FILE_NAME))
 	run_k_means(data)
-	# run_k_means_5_times_for_each_number(data)
-	# run_k_means_with_set_initial_centers(data)
+	run_k_means_5_times_for_each_number(data)
+	run_k_means_with_set_initial_centers(data)
 
