@@ -1,4 +1,4 @@
-# Intelligent Systems CA2
+# Intelligent Systems CA3
 
 ### Q1: K-Means Clustering 
 ### Q2: Hierarchical Clustering
